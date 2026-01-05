@@ -44,14 +44,16 @@ def find_min_packages(weights: List[int], target_weight: int) -> Optional[List[i
     """
     # Try combinations of increasing size (1, 2, 3...)
     for r in range(1, len(weights) + 1):
-        possible_sets = []
-        for combo in combinations(weights, r):
-            if sum(combo) == target_weight:
-                possible_sets.append(list(combo))
+        # Find combinations of size r that sum to the target
+        valid_combos = (combo for combo in combinations(weights, r) if sum(combo) == target_weight)
 
-        # If we found any sets of this size, find the one with the smallest product
-        if possible_sets:
-            return min(possible_sets, key=prod)
+        # If we found any, find the one with the smallest product and return it
+        try:
+            # min() on an empty generator raises ValueError
+            return list(min(valid_combos, key=prod))
+        except ValueError:
+            # No valid combos of this size, continue to the next size
+            continue
 
     return None
 
