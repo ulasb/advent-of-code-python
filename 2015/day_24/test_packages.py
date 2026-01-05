@@ -20,8 +20,9 @@ class TestPackageBalancing(unittest.TestCase):
         Test Part 1 balancing (3 groups).
         """
         target = self.total_weight // 3  # 20
-        result = find_min_packages(self.weights, target)
         # Expected: 11 and 9 (size 2, product 99, sum 20)
+        # We also verify it can be partitioned into 2 more groups of 20
+        result = find_min_packages(self.weights, target, 3)
         self.assertIsNotNone(result)
         self.assertEqual(len(result), 2)
         self.assertEqual(prod(result), 99)
@@ -32,8 +33,9 @@ class TestPackageBalancing(unittest.TestCase):
         Test Part 2 balancing (4 groups).
         """
         target = self.total_weight // 4  # 15
-        result = find_min_packages(self.weights, target)
         # Expected: 11 and 4 (size 2, product 44, sum 15)
+        # We also verify it can be partitioned into 3 more groups of 15
+        result = find_min_packages(self.weights, target, 4)
         self.assertIsNotNone(result)
         self.assertEqual(len(result), 2)
         self.assertEqual(prod(result), 44)
