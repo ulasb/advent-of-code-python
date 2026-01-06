@@ -6,7 +6,7 @@ class TestCodes(unittest.TestCase):
 
     def test_grid_values(self):
         """Verify the code generator against the provided 6x6 grid of values."""
-        # x is row number, y is column number
+        # Keys are (row, col) tuples, values are the expected codes.
         expected_grid = {
             (1, 1): 20151125, (1, 2): 18749137, (1, 3): 17289845, (1, 4): 30943339, (1, 5): 10071777, (1, 6): 33511524,
             (2, 1): 31916031, (2, 2): 21629792, (2, 3): 16929656, (2, 4): 7726640,  (2, 5): 15514188, (2, 6): 4041754,
