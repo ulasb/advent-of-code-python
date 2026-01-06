@@ -11,13 +11,23 @@ to the code be made available under the same license.
 
 import argparse
 import logging
-import sys
+import os
+import re
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 DEFAULT_INPUT_FILE = "input.txt"
+
+# Constants for the weather machine sequence
+INITIAL_CODE = 20151125
+MULTIPLIER = 252533
+MODULUS = 33554393
+
+# Default target coordinates
+DEFAULT_ROW = 2947
+DEFAULT_COL = 3029
 
 
 def read_input(filename: str = DEFAULT_INPUT_FILE) -> tuple[int, int]:
@@ -41,8 +51,6 @@ def read_input(filename: str = DEFAULT_INPUT_FILE) -> tuple[int, int]:
     ValueError
         If the row or column cannot be found in the file.
     """
-    import re
-    import os
 
     if not os.path.exists(filename):
         raise FileNotFoundError(f"Input file '{filename}' not found.")
@@ -109,13 +117,10 @@ def get_code(row: int, col: int) -> int:
         The code value at the specified position.
     """
     index = get_index(row, col)
-    initial_code = 20151125
-    multiplier = 252533
-    modulus = 33554393
 
     # Using modular exponentiation for efficiency:
-    # code = (initial_code * (multiplier ** (index - 1))) % modulus
-    return (initial_code * pow(multiplier, index - 1, modulus)) % modulus
+    # code = (INITIAL_CODE * (MULTIPLIER ** (index - 1))) % MODULUS
+    return (INITIAL_CODE * pow(MULTIPLIER, index - 1, MODULUS)) % MODULUS
 
 
 def parse_arguments():
@@ -146,7 +151,7 @@ def main():
         logger.info(f"Read target from {args.file}: row {row}, column {col}")
     except (FileNotFoundError, ValueError) as e:
         logger.warning(f"Using default coordinates due to error: {e}")
-        row, col = 2947, 3029
+        row, col = DEFAULT_ROW, DEFAULT_COL
 
     result = get_code(row, col)
     logger.info(f"Code at row {row}, column {col}: {result}")
