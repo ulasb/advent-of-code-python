@@ -55,16 +55,15 @@ def update_location(current_direction, current_location, direction_string):
     # 2. Move in the new direction by 'steps' amount (one step at a time)
     positions_visited = []
     new_location = current_location
+    direction_deltas = {
+        Direction.NORTH: (0, 1),
+        Direction.EAST: (1, 0),
+        Direction.SOUTH: (0, -1),
+        Direction.WEST: (-1, 0),
+    }
+    dx, dy = direction_deltas[current_direction]
     for _ in range(steps):
-        if current_direction == Direction.NORTH:
-            new_location = (new_location[0], new_location[1] + 1)
-        elif current_direction == Direction.SOUTH:
-            new_location = (new_location[0], new_location[1] - 1)
-        elif current_direction == Direction.EAST:
-            new_location = (new_location[0] + 1, new_location[1])
-        elif current_direction == Direction.WEST:
-            new_location = (new_location[0] - 1, new_location[1])
-
+        new_location = (new_location[0] + dx, new_location[1] + dy)
         positions_visited.append(new_location)
 
     # 3. Return new direction, location, and all positions visited
