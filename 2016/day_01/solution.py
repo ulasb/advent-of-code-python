@@ -21,6 +21,22 @@ class Direction(Enum):
     WEST = 3
 
 
+def manhattan_distance(location):
+    """Calculate Manhattan distance from origin to location.
+
+    Parameters
+    ----------
+    location : tuple
+        Tuple (x, y) representing a position
+
+    Returns
+    -------
+    int
+        Manhattan distance (sum of absolute values of coordinates)
+    """
+    return abs(location[0]) + abs(location[1])
+
+
 def update_location(current_direction, current_location, direction_string):
     """Update location based on current direction and direction string.
 
@@ -94,7 +110,7 @@ def process_directions(directions):
 
     # Process each direction
     for direction in directions:
-        current_direction, current_location, positions_visited = updateLocation(
+        current_direction, current_location, positions_visited = update_location(
             current_direction, current_location, direction
         )
 
@@ -119,7 +135,7 @@ class TestAdventOfCodeDay1(unittest.TestCase):
         final_loc, final_dir, hq_loc = process_directions(directions)
 
         self.assertIsNotNone(hq_loc, "HQ location should be found")
-        hq_distance = abs(hq_loc[0]) + abs(hq_loc[1])
+        hq_distance = manhattan_distance(hq_loc)
         self.assertEqual(hq_distance, 4, f"HQ should be 4 blocks away, got {hq_distance}")
 
     def test_distance_r2_l3(self):
@@ -128,7 +144,7 @@ class TestAdventOfCodeDay1(unittest.TestCase):
         final_loc, final_dir, hq_loc = process_directions(directions)
 
         self.assertEqual(final_loc, (2, 3))
-        distance = abs(final_loc[0]) + abs(final_loc[1])
+        distance = manhattan_distance(final_loc)
         self.assertEqual(distance, 5)
 
     def test_distance_r2_r2_r2(self):
@@ -137,7 +153,7 @@ class TestAdventOfCodeDay1(unittest.TestCase):
         final_loc, final_dir, hq_loc = process_directions(directions)
 
         self.assertEqual(final_loc, (0, -2))
-        distance = abs(final_loc[0]) + abs(final_loc[1])
+        distance = manhattan_distance(final_loc)
         self.assertEqual(distance, 2)
 
     def test_distance_r5_l5_r5_r3(self):
@@ -145,7 +161,7 @@ class TestAdventOfCodeDay1(unittest.TestCase):
         directions = ["R5", "L5", "R5", "R3"]
         final_loc, final_dir, hq_loc = process_directions(directions)
 
-        distance = abs(final_loc[0]) + abs(final_loc[1])
+        distance = manhattan_distance(final_loc)
         self.assertEqual(distance, 12)
 
 
@@ -175,11 +191,11 @@ def main():
     # Print results
     if hq_location:
         print(f"First twice visited location: {hq_location}")
-        print(f"Distance to HQ: {abs(hq_location[0]) + abs(hq_location[1])}")
+        print(f"Distance to HQ: {manhattan_distance(hq_location)}")
 
     print(f"Final location: {final_location}")
     print(f"Final direction: {final_direction}")
-    print(f"Distance: {abs(final_location[0]) + abs(final_location[1])}")
+    print(f"Distance: {manhattan_distance(final_location)}")
 
 
 if __name__ == "__main__":
