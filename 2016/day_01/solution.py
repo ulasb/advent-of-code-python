@@ -21,7 +21,7 @@ class Direction(Enum):
     WEST = 3
 
 
-def updateLocation(current_direction, current_location, direction_string):
+def update_location(current_direction, current_location, direction_string):
     """Update location based on current direction and direction string.
 
     Direction string format: Lx or Rx where x is number of steps.
