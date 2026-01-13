@@ -104,13 +104,9 @@ def process_directions(directions):
             for pos in positions_visited:
                 if pos in visited_locations:
                     hq_location = pos
-                    break
                 else:
                     visited_locations.add(pos)
 
-        # If we found HQ, we can stop checking further positions
-        if hq_location is not None:
-            break
 
     return current_location, current_direction, hq_location
 
