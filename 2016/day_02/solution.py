@@ -96,7 +96,11 @@ def main():
 
     try:
         with open(args.filename, "r") as f:
-            instructions = [line.strip() for line in f if line.strip()]
+        instructions = []
+        for line in f:
+            stripped_line = line.strip()
+            if stripped_line:
+                instructions.append(stripped_line)
 
         # Part 1: Standard 3x3 keypad, starts at '5' (1, 1)
         part1_code = solve_keypad(instructions, PAD1, (1, 1))
