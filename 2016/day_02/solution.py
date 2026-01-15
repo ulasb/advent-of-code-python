@@ -22,7 +22,7 @@ PAD2 = [
 ]
 
 
-def get_new_position(position, direction, pad):
+def get_new_position(position: tuple[int, int], direction: str, pad: list[list[int | str | None]]) -> tuple[int, int]:
     """
     Calculate the new position on the keypad based on a move direction.
 
