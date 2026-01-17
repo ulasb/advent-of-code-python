@@ -69,13 +69,12 @@ def solve_part2(data: List[List[int]]) -> int:
         The number of valid triangles.
     """
     count = 0
-    # Process 3 rows at a time
-    for i in range(0, len(data) - 2, 3):
-        # Transpose the 3x3 block
-        row1, row2, row3 = data[i], data[i + 1], data[i + 2]
-        for col in range(3):
-            triplet = [row1[col], row2[col], row3[col]]
-            if is_valid_triangle(triplet):
+    # Process the data in blocks of 3 rows
+    for i in range(0, len(data), 3):
+        block = data[i : i + 3]
+        # Transpose the 3x3 block to get vertical triplets
+        for triplet in zip(*block):
+            if is_valid_triangle(list(triplet)):
                 count += 1
     return count
 
