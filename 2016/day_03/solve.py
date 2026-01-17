@@ -33,8 +33,8 @@ def is_valid_triangle(sides: List[int]) -> bool:
     """
     if len(sides) != 3:
         return False
-    a, b, c = sides
-    return a + b > c and a + c > b and b + c > a
+    a, b, c = sorted(sides)
+    return a + b > c
 
 
 def solve_part1(data: List[List[int]]) -> int:
