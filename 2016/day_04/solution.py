@@ -8,7 +8,7 @@ import sys
 import os
 
 
-def decrypt_name(name, sector_id):
+def decrypt_name(name: str, sector_id: int) -> str:
     """
     Decrypts the name using the sector ID.
 
