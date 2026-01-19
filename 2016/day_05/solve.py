@@ -32,11 +32,11 @@ def part1(door_id: str) -> str:
     """
     password = ""
     index = 0
-    door_id_bytes = door_id.encode()
+    base_hasher = hashlib.md5(door_id.encode())
 
     while len(password) < 8:
         # Optimization: use digest bytes to avoid hex string conversion in hot loop
-        m = hashlib.md5(door_id_bytes)
+        m = base_hasher.copy()
         m.update(str(index).encode())
         digest = m.digest()
 
