@@ -24,7 +24,9 @@ def decrypt_name(name: str, sector_id: int) -> str:
     str
         The decrypted name.
     """
-    return "".join([chr((ord(char) - ord("a") + sector_id) % 26 + ord("a")) for char in name])
+    return "".join(
+        [chr((ord(char) - ord("a") + sector_id) % 26 + ord("a")) for char in name]
+    )
 
 
 def calculate_checksum(name):
@@ -41,13 +43,10 @@ def calculate_checksum(name):
     str
         The 5-character checksum.
     """
-    # Count the frequency of each character in the name
+    # Count the frequency of each character in the name using dict.get()
     char_count = {}
     for char in name:
-        if char in char_count:
-            char_count[char] += 1
-        else:
-            char_count[char] = 1
+        char_count[char] = char_count.get(char, 0) + 1
 
     # Sort the characters by frequency and then alphabetically
     sorted_chars = sorted(char_count.items(), key=lambda x: (-x[1], x[0]))
@@ -67,34 +66,26 @@ def validate(line):
 
     Returns
     -------
-    int
-        The sector ID if the room is valid, 0 otherwise.
+    tuple (int, str)
+        A tuple containing the sector ID and the room name (with dashes removed)
+        if the room is valid, or (0, "") otherwise.
     """
     line = line.strip()
 
     if not line:
-        return 0
+        return 0, ""
 
-    try:
-        parts = line.split("-")
-        sector_id_part, checksum_part = parts[-1].split("[")
-        sector_id = int(sector_id_part)
-        checksum = checksum_part.replace("]", "")
-        name = "".join(parts[:-1])
+    parts = line.split("-")
+    sector_id_part, checksum_part = parts[-1].split("[")
+    sector_id = int(sector_id_part)
+    checksum = checksum_part.replace("]", "")
+    name = "".join(parts[:-1])
 
-        # We will also decrypt the name
-        decrypted_name = decrypt_name(name, sector_id)
-        if decrypted_name == "northpoleobjectstorage":
-            print("Sector ID for Storage:", sector_id)
+    # Check if the checksum is valid
+    if checksum != calculate_checksum(name):
+        return 0, ""
 
-        # Check if the checksum is valid
-        if checksum != calculate_checksum(name):
-            return 0
-
-        return sector_id
-    except (ValueError, IndexError):
-        # Specific exception handling as per AGENTS.md
-        return 0
+    return sector_id, name
 
 
 def main():
@@ -108,12 +99,31 @@ def main():
         print(f"Error: File '{filename}' not found.")
         sys.exit(1)
 
-    valid_count = 0
-    with open(filename, "r") as f:
-        for line in f:
-            valid_count += validate(line)
+    sector_id_sum = 0
+    try:
+        with open(filename, "r") as f:
+            for line_num, line in enumerate(f, 1):
+                try:
+                    sector_id, name = validate(line)
+                    if sector_id > 0:
+                        sector_id_sum += sector_id
 
-    print(f"Total sector ID sum: {valid_count}")
+                        # Part 2 logic: check for north pole object storage
+                        decrypted_name = decrypt_name(name, sector_id)
+                        if "northpole" in decrypted_name:
+                            print(
+                                f"Room found: {decrypted_name} (Sector ID: {sector_id})"
+                            )
+
+                except (ValueError, IndexError) as e:
+                    # Specific error handling at the top level
+                    print(f"Error processing line {line_num}: {e}")
+
+    except IOError as e:
+        print(f"File error: {e}")
+        sys.exit(1)
+
+    print(f"Total sector ID sum: {sector_id_sum}")
 
 
 if __name__ == "__main__":

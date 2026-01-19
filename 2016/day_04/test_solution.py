@@ -17,15 +17,16 @@ class TestDay04(unittest.TestCase):
         """
         Tests rooms that are expected to be valid.
         """
-        self.assertEqual(validate("aaaaa-bbb-z-y-x-123[abxyz]"), 123)
-        self.assertEqual(validate("a-b-c-d-e-f-g-h-987[abcde]"), 987)
-        self.assertEqual(validate("not-a-real-room-404[oarel]"), 404)
+        # Now returns (sector_id, name)
+        self.assertEqual(validate("aaaaa-bbb-z-y-x-123[abxyz]"), (123, "aaaaabbbzyx"))
+        self.assertEqual(validate("a-b-c-d-e-f-g-h-987[abcde]"), (987, "abcdefgh"))
+        self.assertEqual(validate("not-a-real-room-404[oarel]"), (404, "notarealroom"))
 
     def test_invalid_rooms(self):
         """
         Tests rooms that are expected to be invalid.
         """
-        self.assertEqual(validate("totally-real-room-200[decoy]"), 0)
+        self.assertEqual(validate("totally-real-room-200[decoy]"), (0, ""))
 
 
 if __name__ == "__main__":
