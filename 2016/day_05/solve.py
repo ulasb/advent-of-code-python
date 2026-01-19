@@ -69,10 +69,10 @@ def part2(door_id: str) -> str:
     password = ["_"] * 8
     found_count = 0
     index = 0
-    door_id_bytes = door_id.encode()
+    base_hasher = hashlib.md5(door_id.encode())
 
     while found_count < 8:
-        m = hashlib.md5(door_id_bytes)
+        m = base_hasher.copy()
         m.update(str(index).encode())
         digest = m.digest()
 
