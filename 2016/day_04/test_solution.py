@@ -5,7 +5,7 @@
 # the licensed files be shared under the same license terms.
 
 import unittest
-from solution import validate
+from solution import validate, decrypt_name
 
 
 class TestDay04(unittest.TestCase):
@@ -27,6 +27,14 @@ class TestDay04(unittest.TestCase):
         Tests rooms that are expected to be invalid.
         """
         self.assertEqual(validate("totally-real-room-200[decoy]"), (0, ""))
+
+    def test_decryption(self):
+        """
+        Tests the decryption logic for room names.
+        """
+        # "qzmtzixmtkozyivhz" with sector ID 343 shifts each letter by 5
+        # (343 % 26 = 5), resulting in "veryencryptedname".
+        self.assertEqual(decrypt_name("qzmtzixmtkozyivhz", 343), "veryencryptedname")
 
 
 if __name__ == "__main__":
