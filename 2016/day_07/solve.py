@@ -132,4 +132,10 @@ def solve(filename: str = "input.txt") -> tuple[int, int]:
 
 
 if __name__ == "__main__":
-    solve()
+    filename = "input.txt"
+    try:
+        p1, p2 = solve(filename)
+        print(f"Part 1: {p1}")
+        print(f"Part 2: {p2}")
+    except FileNotFoundError:
+        print(f"Error: {filename} not found.")
