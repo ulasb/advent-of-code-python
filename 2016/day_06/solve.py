@@ -45,10 +45,7 @@ def solve_part2(chars: Dict[int, Counter]) -> str:
     str
         The message formed by the least common characters.
     """
-    result = []
-    for i in sorted(chars.keys()):
-        result.append(chars[i].most_common()[-1][0])
-    return "".join(result)
+    return "".join(chars[i].most_common()[-1][0] for i in sorted(chars.keys()))
 
 
 def main() -> None:
