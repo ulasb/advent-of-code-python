@@ -1,5 +1,4 @@
 import re
-from typing import List
 
 # This code was created and published by Ulaş Bardak.
 # It is licensed under the Mozilla Public License 2.0 (MPL 2.0).
@@ -29,29 +28,6 @@ def has_abba(s: str) -> bool:
         if s[i] == s[i + 3] and s[i + 1] == s[i + 2] and s[i] != s[i + 1]:
             return True
     return False
-
-
-def get_abas(s: str) -> List[str]:
-    """Find all ABA patterns in a string and return them as a list.
-
-    An ABA is a three-character sequence where the first and third characters
-    are the same, and the second character is different.
-
-    Parameters
-    ----------
-    s : str
-        The string to scan for ABA patterns.
-
-    Returns
-    -------
-    List[str]
-        A list of found ABA patterns.
-    """
-    abas = []
-    for i in range(len(s) - 2):
-        if s[i] == s[i + 2] and s[i] != s[i + 1]:
-            abas.append(s[i : i + 3])
-    return abas
 
 
 def supports_tls(ip: str) -> bool:
@@ -99,12 +75,25 @@ def supports_ssl(ip: str) -> bool:
     outside = parts[0::2]
     inside = parts[1::2]
 
-    # Find all ABA patterns from outside and check for corresponding BAB inside
+    # Collect all ABA patterns from supernet segments into a set
+    abas = set()
     for segment in outside:
-        for aba in get_abas(segment):
-            bab = aba[1] + aba[0] + aba[1]
-            if any(bab in h_segment for h_segment in inside):
-                return True
+        for i in range(len(segment) - 2):
+            if segment[i] == segment[i + 2] and segment[i] != segment[i + 1]:
+                abas.add(segment[i : i + 3])
+
+    # If no ABAs found, SSL is not supported
+    if not abas:
+        return False
+
+    # Check hypernet segments for any corresponding BAB patterns
+    for segment in inside:
+        for i in range(len(segment) - 2):
+            if segment[i] == segment[i + 2] and segment[i] != segment[i + 1]:
+                # Construct the ABA that would correspond to this BAB
+                target_aba = segment[i + 1] + segment[i] + segment[i + 1]
+                if target_aba in abas:
+                    return True
 
     return False
 
