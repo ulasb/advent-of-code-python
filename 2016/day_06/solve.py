@@ -11,7 +11,32 @@ distribute it in executable form.
 
 import sys
 from collections import Counter, defaultdict
-from typing import Dict, List
+from typing import Dict, Iterable
+
+
+def parse_input(lines: Iterable[str]) -> Dict[int, Counter]:
+    """
+    Parse the input lines into a mapping of column positions to character frequencies.
+
+    Parameters
+    ----------
+    lines : Iterable[str]
+        An iterable of strings, each representing a line from the input.
+
+    Returns
+    -------
+    Dict[int, Counter]
+        A dictionary where keys are column indices and values are Counter objects
+        storing character frequencies in that column.
+    """
+    chars: Dict[int, Counter] = defaultdict(Counter)
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        for i, char in enumerate(line):
+            chars[i][char] += 1
+    return chars
 
 
 def solve_part1(chars: Dict[int, Counter]) -> str:
@@ -56,16 +81,9 @@ def main() -> None:
     # defaulting to 'input.txt' if none is provided.
     filename = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
 
-    chars: Dict[int, Counter] = defaultdict(Counter)
-
     try:
         with open(filename, "r") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                for i, char in enumerate(line):
-                    chars[i][char] += 1
+            chars = parse_input(f)
 
     except FileNotFoundError:
         print(f"Error: {filename} not found.")
