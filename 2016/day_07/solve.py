@@ -109,25 +109,26 @@ def supports_ssl(ip: str) -> bool:
     return False
 
 
-def solve(filename: str = "input.txt") -> None:
+def solve(filename: str = "input.txt") -> tuple[int, int]:
     """Solve the problem using the provided input file.
 
     Parameters
     ----------
     filename : str, optional
         The path to the input file, by default "input.txt"
+
+    Returns
+    -------
+    tuple[int, int]
+        A tuple containing the results for Part 1 and Part 2.
     """
-    try:
-        with open(filename, "r") as f:
-            ips = f.read().splitlines()
+    with open(filename, "r") as f:
+        ips = f.read().splitlines()
 
-        p1 = sum(1 for ip in ips if supports_tls(ip))
-        p2 = sum(1 for ip in ips if supports_ssl(ip))
+    p1 = sum(1 for ip in ips if supports_tls(ip))
+    p2 = sum(1 for ip in ips if supports_ssl(ip))
 
-        print(f"Part 1: {p1}")
-        print(f"Part 2: {p2}")
-    except FileNotFoundError:
-        print(f"Error: {filename} not found.")
+    return p1, p2
 
 
 if __name__ == "__main__":
