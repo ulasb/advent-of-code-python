@@ -13,7 +13,7 @@ import re
 import itertools
 import unittest
 from collections import deque
-from typing import List, Tuple, Set, Dict, Optional
+from typing import List, Tuple, Set
 
 
 def parse_input(filename: str) -> Tuple[List[List[str]], List[List[str]]]:
