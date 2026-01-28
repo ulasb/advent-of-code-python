@@ -46,12 +46,14 @@ def parse_input(filename: str) -> Tuple[List[List[str]], List[List[str]]]:
             floors_gens.append(sorted(gens))
             floors_chips.append(sorted(chips))
 
-    # Ensure we always have 4 floors
+    # Ensure we have 4 floors
+    if len(floors_gens) > 4:
+        raise ValueError(f"Input has {len(floors_gens)} floors, expected at most 4.")
     while len(floors_gens) < 4:
         floors_gens.append([])
         floors_chips.append([])
 
-    return floors_gens[:4], floors_chips[:4]
+    return floors_gens, floors_chips
 
 
 def print_floors(
