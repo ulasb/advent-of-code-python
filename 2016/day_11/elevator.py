@@ -149,13 +149,7 @@ def solve(floors_gens: List[List[str]], floors_chips: List[List[str]]) -> int:
         The minimum number of steps, or -1 if no solution is found.
     """
     # Collect all unique types and map them to indices
-    all_types: Set[str] = set()
-    for floor in floors_gens:
-        for t in floor:
-            all_types.add(t)
-    for floor in floors_chips:
-        for t in floor:
-            all_types.add(t)
+    all_types = set(itertools.chain.from_iterable(floors_gens + floors_chips))
 
     all_types_list = sorted(list(all_types))
     type_to_idx = {t: i for i, t in enumerate(all_types_list)}
@@ -206,12 +200,7 @@ def solve(floors_gens: List[List[str]], floors_chips: List[List[str]]) -> int:
 
                 # Pruning: Don't move items down if all floors below are empty
                 if direction == -1:
-                    all_below_empty = True
-                    for f_idx in range(e_pos):
-                        if any(p == f_idx for p in g_p) or any(p == f_idx for p in c_p):
-                            all_below_empty = False
-                            break
-                    if all_below_empty:
+                    if not any(p < e_pos for p in g_p + c_p):
                         continue
 
                 new_g_p = list(g_p)
