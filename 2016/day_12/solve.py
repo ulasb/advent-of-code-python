@@ -64,19 +64,17 @@ def run_program(
         if pc + 2 < n:
             cmd2, args2 = parsed_instrs[pc + 1]
             cmd3, args3 = parsed_instrs[pc + 2]
-            if (
-                cmd3 == JNZ
-                and args3[0] == (True, args2[0][1])
-                and args3[1] == (False, -2)
-            ):
-                if cmd == INC and cmd2 == DEC:
+            if cmd3 == JNZ and args3[1] == (False, -2):
+                # Pattern: inc x, dec y, jnz y -2
+                if cmd == INC and cmd2 == DEC and args3[0] == (True, args2[0][1]):
                     reg_a = args[0][1]
                     reg_b = args2[0][1]
                     regs[reg_a] += regs[reg_b]
                     regs[reg_b] = 0
                     pc += 3
                     continue
-                elif cmd == DEC and cmd2 == INC:
+                # Pattern: dec y, inc x, jnz y -2
+                elif cmd == DEC and cmd2 == INC and args3[0] == (True, args[0][1]):
                     reg_a = args2[0][1]
                     reg_b = args[0][1]
                     regs[reg_a] += regs[reg_b]
