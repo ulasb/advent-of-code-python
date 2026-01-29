@@ -99,8 +99,6 @@ def run_program(
                 pc += args[1][1]
             else:
                 pc += 1
-        else:
-            pc += 1
 
     # Convert back to dictionary
     return {r: regs[i] for r, i in reg_map.items()}

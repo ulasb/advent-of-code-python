@@ -65,6 +65,38 @@ class TestDay12(unittest.TestCase):
         final_registers = run_program(instructions, registers)
         self.assertEqual(final_registers["a"], 1)
 
+    def test_peephole_add(self):
+        """
+        Tests the peephole optimization for addition loops.
+        """
+        instructions = [
+            "cpy 5 b",
+            "cpy 10 a",
+            "inc a",
+            "dec b",
+            "jnz b -2", # a should be 15, b should be 0
+        ]
+        registers = {"a": 0, "b": 0, "c": 0, "d": 0}
+        final_registers = run_program(instructions, registers)
+        self.assertEqual(final_registers["a"], 15)
+        self.assertEqual(final_registers["b"], 0)
+
+    def test_peephole_add_reversed(self):
+        """
+        Tests the peephole optimization for addition loops with reversed instructions.
+        """
+        instructions = [
+            "cpy 5 b",
+            "cpy 10 a",
+            "dec b",
+            "inc a",
+            "jnz b -2", # a should be 15, b should be 0
+        ]
+        registers = {"a": 0, "b": 0, "c": 0, "d": 0}
+        final_registers = run_program(instructions, registers)
+        self.assertEqual(final_registers["a"], 15)
+        self.assertEqual(final_registers["b"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
