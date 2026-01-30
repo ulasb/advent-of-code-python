@@ -4,22 +4,17 @@ from maze import is_wall, count_moves, count_rooms, FAVORITE_NUMBER
 
 class TestMaze(unittest.TestCase):
     def test_example_shortest_path(self):
-        # Using the example favorite number 10
-        # The problem says target (7, 4) is 11 steps away from (1, 1)
-
-        # We need to temporarily override FAVORITE_NUMBER or mock is_wall
+        """Test the example case with FAVORITE_NUMBER=10."""
+        from unittest.mock import patch
         import maze
 
-        original_val = maze.FAVORITE_NUMBER
-        maze.FAVORITE_NUMBER = 10
-        maze.is_wall.cache_clear()  # Clear cache for new number
+        # Clear cache after the test to prevent side effects
+        self.addCleanup(maze.is_wall.cache_clear)
 
-        try:
+        with patch("maze.FAVORITE_NUMBER", 10):
+            maze.is_wall.cache_clear()  # Clear cache for the new constant
             moves = count_moves((1, 1), (7, 4))
             self.assertEqual(moves, 11)
-        finally:
-            maze.FAVORITE_NUMBER = original_val
-            maze.is_wall.cache_clear()
 
     def test_part1_result(self):
         # Verify our current answer for Part 1 remains consistent
