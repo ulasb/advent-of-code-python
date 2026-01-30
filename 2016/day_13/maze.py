@@ -102,10 +102,7 @@ def count_rooms(start_room: tuple[int, int], max_moves: int) -> int:
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 nx, ny = x + dx, y + dy
                 if (
-                    nx >= 0
-                    and ny >= 0
-                    and (nx, ny) not in visited
-                    and not is_wall(nx, ny)
+                    (nx, ny) not in visited and not is_wall(nx, ny)
                 ):
                     visited.add((nx, ny))
                     queue.append((nx, ny))
