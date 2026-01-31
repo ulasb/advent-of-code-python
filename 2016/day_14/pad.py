@@ -116,7 +116,7 @@ def solve():
             quintet_counts[char] += 1
 
     print("-" * 35)
-    print(f"SUCCESS! The {NUM_KEYS}th key is at index: {keys[63]}")
+    print(f"SUCCESS! The {NUM_KEYS}th key is at index: {keys[-1]}")
 
 if __name__ == "__main__":
     solve()
