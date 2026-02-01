@@ -116,9 +116,8 @@ def main() -> None:
         print(f"Part 1: {result_p1}")
 
         # Part 2: Add a new disc with 11 positions at position 0, at the next index
-        next_index = len(discs) + 1
-        discs.append(Disc(num_positions=11, starting_position=0, index=next_index))
-        result_p2 = solve(discs)
+        discs_p2 = discs + [Disc(num_positions=11, starting_position=0, index=len(discs) + 1)]
+        result_p2 = solve(discs_p2)
         print(f"Part 2: {result_p2}")
 
     except FileNotFoundError:
