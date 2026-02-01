@@ -103,9 +103,14 @@ def solve(discs: List[Disc]) -> int:
     return time
 
 
-def main() -> None:
+def main() -> int:
     """
     Main entry point for the script.
+
+    Returns
+    -------
+    int
+        Exit code (0 for success, 1 for failure).
     """
     try:
         filename = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
@@ -116,17 +121,21 @@ def main() -> None:
         print(f"Part 1: {result_p1}")
 
         # Part 2: Add a new disc with 11 positions at position 0, at the next index
-        discs_p2 = discs + [Disc(num_positions=11, starting_position=0, index=len(discs) + 1)]
+        discs_p2 = discs + [
+            Disc(num_positions=11, starting_position=0, index=len(discs) + 1)
+        ]
         result_p2 = solve(discs_p2)
         print(f"Part 2: {result_p2}")
 
+        return 0
+
     except FileNotFoundError:
         print(f"Error: File '{filename}' not found.", file=sys.stderr)
-        sys.exit(1)
+        return 1
     except Exception as e:
         print(f"An unexpected error occurred: {e}", file=sys.stderr)
-        sys.exit(1)
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
