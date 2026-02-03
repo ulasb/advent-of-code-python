@@ -60,14 +60,7 @@ def checksum(data: str) -> str:
     str
         The calculated checksum.
     """
-    res = []
-    # Using a list comprehension or range with indexing
-    for i in range(0, len(data), 2):
-        if data[i] == data[i + 1]:
-            res.append("1")
-        else:
-            res.append("0")
-    return "".join(res)
+    return "".join("1" if data[i] == data[i + 1] else "0" for i in range(0, len(data), 2))
 
 
 def calculate_disk_checksum(initial_state: str, disk_size: int) -> str:
