@@ -116,8 +116,8 @@ def main(filename: str = "input.txt"):
         initial_state = "01111010110010011"
 
     # Part 1: Disk size 272
-    part1_result = calculate_disk_checksum(initial_state, 272)
-    print(f"Part 1 (Disk 272): {part1_result}")
+    part1_result = calculate_disk_checksum(initial_state, PART1_DISK_SIZE)
+    print(f"Part 1 (Disk {PART1_DISK_SIZE}): {part1_result}")
 
     # Part 2: Disk size 35651584
     part2_result = calculate_disk_checksum(initial_state, 35651584)
