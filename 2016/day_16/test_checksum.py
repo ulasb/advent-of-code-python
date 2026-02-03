@@ -7,7 +7,7 @@ class TestChecksum(unittest.TestCase):
     Unit tests for the dragon curve and checksum logic.
     """
 
-    def test_dragon_curve(self: unittest.TestCase) -> None:
+    def test_dragon_curve(self) -> None:
         """
         Test the modified dragon curve generation.
 
