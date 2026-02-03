@@ -120,8 +120,8 @@ def main(filename: str = "input.txt"):
     print(f"Part 1 (Disk {PART1_DISK_SIZE}): {part1_result}")
 
     # Part 2: Disk size 35651584
-    part2_result = calculate_disk_checksum(initial_state, 35651584)
-    print(f"Part 2 (Disk 35651584): {part2_result}")
+    part2_result = calculate_disk_checksum(initial_state, PART2_DISK_SIZE)
+    print(f"Part 2 (Disk {PART2_DISK_SIZE}): {part2_result}")
 
 
 if __name__ == "__main__":
