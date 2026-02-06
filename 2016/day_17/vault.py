@@ -108,7 +108,7 @@ def find_longest_path_len(passcode: str) -> int:
     while queue:
         (x, y), path = queue.popleft()
 
-        if (x, y) == (3, 3):
+        if (x, y) == (MAX_X, MAX_Y):
             max_len = max(max_len, len(path))
             continue
 
