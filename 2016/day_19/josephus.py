@@ -4,7 +4,7 @@ def josephus_part1(n: int) -> int:
     """O(1) solution for Part 1: survivor = 2*(n - 2^⌊log₂n⌋) + 1"""
     if n <= 0:
         raise ValueError("n must be positive")
-    l = n - (1 << int(log(n, 2)))
+    l = n - (1 << (n.bit_length() - 1))
     return 2 * l + 1
 
 
