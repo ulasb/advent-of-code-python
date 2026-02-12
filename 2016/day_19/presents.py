@@ -9,7 +9,7 @@ def solve1(num_elves: int) -> int:
     return josephus.josephus_part1(num_elves)
 
 def solve2(num_elves: int) -> int:
-   return josephus.josephus_part2(num_elves)
+    return josephus.josephus_part2(num_elves)
 
 def main():
     ans1 = solve1(NUM_ELVES)
