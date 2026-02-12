@@ -25,7 +25,7 @@ def josephus_part2(n: int) -> int:
 
 
 def brute_force_part1(n: int) -> int:
-    """Brute-force Part 1 using deque rotation (O(n²) worst-case but fine for n < ~10⁴)"""
+    """Brute-force Part 1 using deque rotation (O(n) time, O(n) space)"""
     from collections import deque
     elves = deque(range(1, n + 1))
     while len(elves) > 1:
