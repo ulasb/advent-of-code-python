@@ -146,6 +146,8 @@ def move_position_x_to_position_y(password: str, x: int, y: int) -> str:
     char = password_list.pop(x)
     password_list.insert(y, char)
     return "".join(password_list)
+
+
 def parse_command(transformation: str) -> tuple[str, Dict[str, Any]]:
     """Parse a command string into command type and parameters.
 
@@ -227,12 +229,7 @@ def apply_transformations(
         cmd_type, params = parse_command(transformation)
         op = ops[cmd_type]
 
-        if cmd_type == "rotate_based":
-            password = op(password, params["letter"])
-        elif cmd_type in ("swap_position", "swap_letter", "reverse", "move"):
-            password = op(password, params["x"], params["y"])
-        else:  # rotate_left or rotate_right
-            password = op(password, params["steps"])
+        password = op(password, **params)
 
     return password
 
@@ -256,10 +253,11 @@ def _undo_rotate_based(password: str, letter: str) -> str:
         The password before the rotation.
     """
     for i in range(len(password)):
-        if rotate_based_on_position(rotate_left_right_x_steps(password, "left", i), letter) == password:
-            return rotate_left_right_x_steps(password, "left", i)
-    # This shouldn't happen with valid input
-    return password
+        candidate = rotate_left_right_x_steps(password, "left", i)
+        if rotate_based_on_position(candidate, letter) == password:
+            return candidate
+    raise ValueError(f"Could not find reverse rotation for letter '{letter}'")
+
 
 def main(input_file: str) -> None:
     """Solve both parts of the puzzle.
@@ -272,8 +270,8 @@ def main(input_file: str) -> None:
     input_file : str
         Path to the input file containing transformation commands.
     """
-    with open(input_file) as f:
-        transformations = f.read().strip().split("\n")
+    with open(input_file, "r") as f:
+        transformations = [line for line in f.read().splitlines() if line.strip()]
 
     # Part 1: Scramble password
     initial_password = "abcdefgh"
@@ -286,6 +284,7 @@ def main(input_file: str) -> None:
         scrambled_password, transformations, reverse=True
     )
     print(f"Part 2: Unscrambled password - {unscrambled_password}")
+
 
 class TestFundamentals(unittest.TestCase):
     """Unit tests for password transformation functions."""
