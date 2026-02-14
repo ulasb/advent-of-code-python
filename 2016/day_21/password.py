@@ -81,7 +81,7 @@ def apply_reverse_transformations(password, transformations):
             _, _, x, _, _, y = transformation.split()
             password = swap_letter_x_y(password, y, x)  # Swap back
         elif transformation.startswith('rotate left'):
-            _, direction, steps, _ = transformation.split()
+            _, _, steps, _ = transformation.split()
             password = rotate_left_right_x_steps(password, 'right', int(steps))
         elif transformation.startswith('rotate right'):
             _, direction, steps, _ = transformation.split()
