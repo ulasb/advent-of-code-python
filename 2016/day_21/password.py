@@ -147,6 +147,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == 'test':
             unittest.main()
-        elif sys.argv[1] == 'input_file':
-                input_file = sys.argv[2]
+        elif sys.argv[1] == 'input_file' and len(sys.argv) > 2:
+            input_file = sys.argv[2]
     main(input_file)
