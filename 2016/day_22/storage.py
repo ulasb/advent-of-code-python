@@ -10,7 +10,8 @@ any modifications to the source code stay under the same license.
 
 import itertools
 import collections
-from typing import List, Tuple, Set
+import dataclasses
+from typing import List, Tuple, Set, Iterable
 
 INPUT_FILE_DEFAULT = "input.txt"
 DF_NODE_PREFIX = "/dev/grid/node-x"
