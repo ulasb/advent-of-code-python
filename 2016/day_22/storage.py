@@ -17,7 +17,7 @@ INPUT_FILE_DEFAULT = "input.txt"
 DF_NODE_PREFIX = "/dev/grid/node-x"
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, slots=True)
 class Node:
     """
     Represents a storage node in the grid.
