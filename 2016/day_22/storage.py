@@ -17,6 +17,7 @@ INPUT_FILE_DEFAULT = "input.txt"
 DF_NODE_PREFIX = "/dev/grid/node-x"
 
 
+@dataclasses.dataclass(frozen=True, slots=True)
 class Node:
     """
     Represents a storage node in the grid.
@@ -34,26 +35,20 @@ class Node:
     free : int
         Available space in Terabytes.
     """
+    x: int
+    y: int
+    size: int
+    used: int
+    free: int
 
-    def __init__(self, x: int, y: int, size: int, used: int, free: int):
-        self.x = x
-        self.y = y
-        self.size = size
-        self.used = used
-        self.free = free
-
-    def __repr__(self) -> str:
-        return f"Node({self.x}, {self.y}, size={self.size}, used={self.used}, free={self.free})"
-
-
-def parse_nodes(lines: List[str]) -> List[Node]:
+def parse_nodes(lines: Iterable[str]) -> List[Node]:
     """
     Parses the output of the 'df' command into a list of Node objects.
 
     Parameters
     ----------
-    lines : List[str]
-        The lines from the input file.
+    lines : Iterable[str]
+        The lines from the input source.
 
     Returns
     -------
@@ -132,14 +127,15 @@ def solve_part2(nodes: List[Node]) -> int:
     max_x = max(node.x for node in nodes)
     max_y = max(node.y for node in nodes)
 
-    empty_node = next(n for n in nodes if n.used == 0)
+    try:
+        empty_node = next(n for n in nodes if n.used == 0)
+    except StopIteration:
+        raise ValueError("Grid has no empty node.") from None
+
     empty_capacity = empty_node.size
 
     # Identify obstacles (large nodes that cannot fit data into the empty node)
-    walls: Set[Tuple[int, int]] = set()
-    for n in nodes:
-        if n.used > empty_capacity:
-            walls.add((n.x, n.y))
+    walls: Set[Tuple[int, int]] = {(n.x, n.y) for n in nodes if n.used > empty_capacity}
 
     # Initial state: (empty_x, empty_y, goal_x, goal_y)
     start_state = (empty_node.x, empty_node.y, max_x, 0)
@@ -183,7 +179,7 @@ def main(input_filename: str = INPUT_FILE_DEFAULT) -> None:
         Path to the puzzle input file, by default "input.txt"
     """
     with open(input_filename) as f:
-        nodes = parse_nodes(f.readlines())
+        nodes = parse_nodes(f)
 
     # Part 1
     p1_result = solve_part1(nodes)
