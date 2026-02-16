@@ -74,8 +74,8 @@ class AssembunnyInterpreter:
                 else:
                     try:
                         args.append([False, int(p)])
-                    except ValueError:
-                        args.append([False, 0])
+                    except ValueError as e:
+                        raise ValueError(f"Invalid argument '{p}' in line '{line.strip()}'") from e
             parsed.append([cmd, args])
         return parsed
 
