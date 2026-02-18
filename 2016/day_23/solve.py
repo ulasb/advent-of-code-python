@@ -11,9 +11,26 @@ under the same license.
 
 import sys
 from typing import Dict, List, Tuple, Any
+from dataclasses import dataclass
 
 # Opcode constants
 CPY, INC, DEC, JNZ, TGL = 0, 1, 2, 3, 4
+
+
+@dataclass
+class Argument:
+    """Represents an instruction argument, which can be a register or a literal value."""
+
+    is_reg: bool
+    val: int
+
+
+@dataclass
+class Instruction:
+    """Represents a single Assembunny instruction."""
+
+    op: int
+    args: List[Argument]
 
 
 class AssembunnyInterpreter:
@@ -45,7 +62,7 @@ class AssembunnyInterpreter:
         # Store optimizations as {pc: (length_to_skip, macro_type, args)}
         self.optimizations: Dict[int, Tuple[int, str, Tuple]] = {}
 
-    def _parse(self, raw: List[str]) -> List[List[Any]]:
+    def _parse(self, raw: List[str]) -> List[Instruction]:
         """
         Parse raw instruction strings into a structured format.
 
@@ -56,9 +73,8 @@ class AssembunnyInterpreter:
 
         Returns
         -------
-        List[List[Any]]
-            A list of parsed instructions where each instruction is represented
-            as a list [opcode, [args]].
+        List[Instruction]
+            A list of parsed Instruction objects.
         """
         op_map = {"cpy": CPY, "inc": INC, "dec": DEC, "jnz": JNZ, "tgl": TGL}
         parsed = []
@@ -70,13 +86,15 @@ class AssembunnyInterpreter:
             args = []
             for p in parts[1:]:
                 if p in self.reg_map:
-                    args.append([True, self.reg_map[p]])
+                    args.append(Argument(True, self.reg_map[p]))
                 else:
                     try:
-                        args.append([False, int(p)])
+                        args.append(Argument(False, int(p)))
                     except ValueError as e:
-                        raise ValueError(f"Invalid argument '{p}' in line '{line.strip()}'") from e
-            parsed.append([cmd, args])
+                        raise ValueError(
+                            f"Invalid argument '{p}' in line '{line.strip()}'"
+                        ) from e
+            parsed.append(Instruction(cmd, args))
         return parsed
 
     def find_optimizations(self) -> None:
@@ -91,33 +109,35 @@ class AssembunnyInterpreter:
             # 1. Detect MULTIPLICATION idiom (6 lines)
             # Pattern: cpy b c, inc a, dec c, jnz c -2, dec d, jnz d -5
             if i + 5 < self.n:
-                p = [self.instructions[i + j] for j in range(6)]
+                p = self.instructions[i : i + 6]
                 if (
-                    p[0][0] == CPY
-                    and p[1][0] == INC
-                    and p[2][0] == DEC
-                    and p[3][0] == JNZ
-                    and p[4][0] == DEC
-                    and p[5][0] == JNZ
-                    and p[3][1][1] == [False, -2]
-                    and p[5][1][1] == [False, -5]
+                    p[0].op == CPY
+                    and p[1].op == INC
+                    and p[2].op == DEC
+                    and p[3].op == JNZ
+                    and p[4].op == DEC
+                    and p[5].op == JNZ
+                    and not p[3].args[1].is_reg
+                    and p[3].args[1].val == -2
+                    and not p[5].args[1].is_reg
+                    and p[5].args[1].val == -5
                 ):
                     # Ensure register consistency
-                    temp_reg = p[0][1][1][1]  # 'c'
-                    target_reg = p[1][1][0][1]  # 'a'
-                    src_val_data = p[0][1][0]  # 'b' (as value or reg)
-                    outer_reg = p[4][1][0][1]  # 'd'
+                    temp_reg = p[0].args[1].val  # 'c'
+                    target_reg = p[1].args[0].val  # 'a'
+                    src_arg = p[0].args[0]  # 'b' (as Argument)
+                    outer_reg = p[4].args[0].val  # 'd'
 
                     if (
-                        p[2][1][0][1] == temp_reg
-                        and p[3][1][0][1] == temp_reg
-                        and p[4][1][0][1] == outer_reg
-                        and p[5][1][0][1] == outer_reg
+                        p[2].args[0].val == temp_reg
+                        and p[3].args[0].val == temp_reg
+                        and p[4].args[0].val == outer_reg
+                        and p[5].args[0].val == outer_reg
                     ):
                         self.optimizations[i] = (
                             6,
                             "MUL",
-                            (target_reg, src_val_data, outer_reg, temp_reg),
+                            (target_reg, src_arg, outer_reg, temp_reg),
                         )
                         i += 6
                         continue
@@ -125,23 +145,35 @@ class AssembunnyInterpreter:
             # 2. Detect ADDITION idiom (3 lines)
             # Pattern: inc/dec x, dec/inc y, jnz y -2
             if i + 2 < self.n:
-                p = [self.instructions[i + j] for j in range(3)]
-                if p[2][0] == JNZ and p[2][1][1] == [False, -2]:
+                p = self.instructions[i : i + 3]
+                if (
+                    p[2].op == JNZ
+                    and not p[2].args[1].is_reg
+                    and p[2].args[1].val == -2
+                ):
                     # inc x, dec y, jnz y -2
-                    if p[0][0] == INC and p[1][0] == DEC and p[2][1][0] == p[1][1][0]:
+                    if (
+                        p[0].op == INC
+                        and p[1].op == DEC
+                        and p[2].args[0].val == p[1].args[0].val
+                    ):
                         self.optimizations[i] = (
                             3,
                             "ADD",
-                            (p[0][1][0][1], p[1][1][0][1]),
+                            (p[0].args[0].val, p[1].args[0].val),
                         )
                         i += 3
                         continue
                     # dec y, inc x, jnz y -2
-                    if p[0][0] == DEC and p[1][0] == INC and p[2][1][0] == p[0][1][0]:
+                    if (
+                        p[0].op == DEC
+                        and p[1].op == INC
+                        and p[2].args[0].val == p[0].args[0].val
+                    ):
                         self.optimizations[i] = (
                             3,
                             "ADD",
-                            (p[1][1][0][1], p[0][1][0][1]),
+                            (p[1].args[0].val, p[0].args[0].val),
                         )
                         i += 3
                         continue
@@ -170,8 +202,8 @@ class AssembunnyInterpreter:
             if self.pc in self.optimizations:
                 skip, op, args = self.optimizations[self.pc]
                 if op == "MUL":
-                    target, (src_is_reg, src_val), outer, temp = args
-                    val = self.regs[src_val] if src_is_reg else src_val
+                    target, src_arg, outer, temp = args
+                    val = self.regs[src_arg.val] if src_arg.is_reg else src_arg.val
                     self.regs[target] += val * self.regs[outer]
                     self.regs[temp] = 0
                     self.regs[outer] = 0
@@ -184,40 +216,41 @@ class AssembunnyInterpreter:
                     self.pc += skip
                     continue
 
-            cmd, args = self.instructions[self.pc]
+            instr = self.instructions[self.pc]
+            cmd = instr.op
+            args = instr.args
 
             if cmd == CPY:
-                if args[1][0]:  # Target must be a register
-                    is_reg, val = args[0]
-                    self.regs[args[1][1]] = self.regs[val] if is_reg else val
+                if args[1].is_reg:  # Target must be a register
+                    val = self.regs[args[0].val] if args[0].is_reg else args[0].val
+                    self.regs[args[1].val] = val
                 self.pc += 1
             elif cmd == INC:
-                if args[0][0]:
-                    self.regs[args[0][1]] += 1
+                if args[0].is_reg:
+                    self.regs[args[0].val] += 1
                 self.pc += 1
             elif cmd == DEC:
-                if args[0][0]:
-                    self.regs[args[0][1]] -= 1
+                if args[0].is_reg:
+                    self.regs[args[0].val] -= 1
                 self.pc += 1
             elif cmd == JNZ:
-                is_reg, val = args[0]
-                val = self.regs[val] if is_reg else val
+                val = self.regs[args[0].val] if args[0].is_reg else args[0].val
                 if val != 0:
-                    is_reg2, val2 = args[1]
-                    offset = self.regs[val2] if is_reg2 else val2
+                    offset = self.regs[args[1].val] if args[1].is_reg else args[1].val
                     self.pc += offset
                 else:
                     self.pc += 1
             elif cmd == TGL:
-                is_reg, val = args[0]
-                val = self.regs[val] if is_reg else val
+                val = self.regs[args[0].val] if args[0].is_reg else args[0].val
                 target_idx = self.pc + val
                 if 0 <= target_idx < self.n:
-                    t_cmd, t_args = self.instructions[target_idx]
+                    target_instr = self.instructions[target_idx]
+                    t_cmd = target_instr.op
+                    t_args = target_instr.args
                     if len(t_args) == 1:
-                        self.instructions[target_idx][0] = DEC if t_cmd == INC else INC
+                        target_instr.op = DEC if t_cmd == INC else INC
                     else:
-                        self.instructions[target_idx][0] = CPY if t_cmd == JNZ else JNZ
+                        target_instr.op = CPY if t_cmd == JNZ else JNZ
                     self.find_optimizations()
                 self.pc += 1
 
@@ -260,9 +293,14 @@ def solve_part_2(instructions: List[str]) -> int:
     return interpreter.run(12)
 
 
-def main() -> None:
+def main() -> int:
     """
     Main entry point for the script.
+
+    Returns
+    -------
+    int
+        Exit code: 0 for success, 1 for errors.
     """
     filename = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
     try:
@@ -270,7 +308,7 @@ def main() -> None:
             lines = [l.strip() for l in f if l.strip()]
     except FileNotFoundError:
         print(f"Error: {filename} not found.", file=sys.stderr)
-        sys.exit(1)
+        return 1
 
     print("Running Part 1 (a=7)...")
     print(f"[Part 1] Result: {solve_part_1(lines)}")
@@ -278,6 +316,8 @@ def main() -> None:
     print("\nRunning Part 2 (a=12)...")
     print(f"[Part 2] Result: {solve_part_2(lines)}")
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
