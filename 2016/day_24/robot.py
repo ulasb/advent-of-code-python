@@ -123,7 +123,7 @@ def solve(filename: str = "input.txt") -> tuple[int, int]:
     tuple[int, int]
         A tuple containing (Part 1 result, Part 2 result).
     """
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         input_string = f.read()
 
     numbered_points = parse_input(input_string)
