@@ -9,6 +9,7 @@ under the same license.
 
 import sys
 from itertools import permutations
+from collections import deque
 
 
 def parse_input(input_string: str) -> dict[int, tuple[int, int]]:
