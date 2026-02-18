@@ -52,10 +52,10 @@ def bfs(start: tuple[int, int], end: tuple[int, int], grid: list[str]) -> int:
     int
         The shortest distance between start and end. Returns infinity if no path exists.
     """
-    queue = [(start, 0)]
+    queue = deque([(start, 0)])
     visited = {start}
     while queue:
-        (x, y), dist = queue.pop(0)
+        (x, y), dist = queue.popleft()
         if (x, y) == end:
             return dist
         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
