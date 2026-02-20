@@ -12,9 +12,18 @@ under the same license.
 import sys
 from typing import Dict, List, Tuple, Set, Any
 from dataclasses import dataclass
+from enum import Enum, auto
 
-# Opcode constants
-CPY, INC, DEC, JNZ, TGL, OUT = 0, 1, 2, 3, 4, 5
+
+class Opcode(Enum):
+    """Enumeration of Assembunny opcodes."""
+
+    CPY = auto()
+    INC = auto()
+    DEC = auto()
+    JNZ = auto()
+    TGL = auto()
+    OUT = auto()
 
 
 @dataclass
@@ -41,13 +50,13 @@ class Instruction:
 
     Attributes
     ----------
-    op : int
-        The opcode index.
+    op : Opcode
+        The opcode for the instruction.
     args : List[Argument]
         The list of arguments for the instruction.
     """
 
-    op: int
+    op: Opcode
     args: List[Argument]
 
 
@@ -92,12 +101,12 @@ class AssembunnyInterpreter:
         """
 
         op_map = {
-            "cpy": CPY,
-            "inc": INC,
-            "dec": DEC,
-            "jnz": JNZ,
-            "tgl": TGL,
-            "out": OUT,
+            "cpy": Opcode.CPY,
+            "inc": Opcode.INC,
+            "dec": Opcode.DEC,
+            "jnz": Opcode.JNZ,
+            "tgl": Opcode.TGL,
+            "out": Opcode.OUT,
         }
         parsed = []
         for line in raw:
@@ -133,12 +142,12 @@ class AssembunnyInterpreter:
             if i + 5 < self.n:
                 p = self.instructions[i : i + 6]
                 if (
-                    p[0].op == CPY
-                    and p[1].op == INC
-                    and p[2].op == DEC
-                    and p[3].op == JNZ
-                    and p[4].op == DEC
-                    and p[5].op == JNZ
+                    p[0].op == Opcode.CPY
+                    and p[1].op == Opcode.INC
+                    and p[2].op == Opcode.DEC
+                    and p[3].op == Opcode.JNZ
+                    and p[4].op == Opcode.DEC
+                    and p[5].op == Opcode.JNZ
                     and not p[3].args[1].is_reg
                     and p[3].args[1].val == -2
                     and not p[5].args[1].is_reg
@@ -168,14 +177,14 @@ class AssembunnyInterpreter:
             if i + 2 < self.n:
                 p = self.instructions[i : i + 3]
                 if (
-                    p[2].op == JNZ
+                    p[2].op == Opcode.JNZ
                     and not p[2].args[1].is_reg
                     and p[2].args[1].val == -2
                 ):
                     # inc x, dec y, jnz y -2
                     if (
-                        p[0].op == INC
-                        and p[1].op == DEC
+                        p[0].op == Opcode.INC
+                        and p[1].op == Opcode.DEC
                         and p[2].args[0].val == p[1].args[0].val
                     ):
                         self.optimizations[i] = (
@@ -187,8 +196,8 @@ class AssembunnyInterpreter:
                         continue
                     # dec y, inc x, jnz y -2
                     if (
-                        p[0].op == DEC
-                        and p[1].op == INC
+                        p[0].op == Opcode.DEC
+                        and p[1].op == Opcode.INC
                         and p[2].args[0].val == p[0].args[0].val
                     ):
                         self.optimizations[i] = (
@@ -255,34 +264,34 @@ class AssembunnyInterpreter:
             cmd = instr.op
             args = instr.args
 
-            if cmd == CPY:
+            if cmd == Opcode.CPY:
                 if args[1].is_reg:
                     val = self.regs[args[0].val] if args[0].is_reg else args[0].val
                     self.regs[args[1].val] = val
                 self.pc += 1
-            elif cmd == INC:
+            elif cmd == Opcode.INC:
                 if args[0].is_reg:
                     self.regs[args[0].val] += 1
                 self.pc += 1
-            elif cmd == DEC:
+            elif cmd == Opcode.DEC:
                 if args[0].is_reg:
                     self.regs[args[0].val] -= 1
                 self.pc += 1
-            elif cmd == JNZ:
+            elif cmd == Opcode.JNZ:
                 val = self.regs[args[0].val] if args[0].is_reg else args[0].val
                 if val != 0:
                     offset = self.regs[args[1].val] if args[1].is_reg else args[1].val
                     self.pc += offset
                 else:
                     self.pc += 1
-            elif cmd == OUT:
+            elif cmd == Opcode.OUT:
                 val = self.regs[args[0].val] if args[0].is_reg else args[0].val
                 if val != next_expected:
                     return False
                 next_expected = 1 - next_expected
                 output_count += 1
                 self.pc += 1
-            elif cmd == TGL:
+            elif cmd == Opcode.TGL:
                 # Should not be present in Day 25 but kept for compatibility
                 val = self.regs[args[0].val] if args[0].is_reg else args[0].val
                 target_idx = self.pc + val
@@ -291,9 +300,13 @@ class AssembunnyInterpreter:
                     t_cmd = target_instr.op
                     t_args = target_instr.args
                     if len(t_args) == 1:
-                        target_instr.op = DEC if t_cmd == INC else INC
+                        target_instr.op = (
+                            Opcode.DEC if t_cmd == Opcode.INC else Opcode.INC
+                        )
                     else:
-                        target_instr.op = CPY if t_cmd == JNZ else JNZ
+                        target_instr.op = (
+                            Opcode.CPY if t_cmd == Opcode.JNZ else Opcode.JNZ
+                        )
                     self.find_optimizations()
                 self.pc += 1
             else:
