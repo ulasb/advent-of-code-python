@@ -68,17 +68,18 @@ def main():
     filename = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
 
     if not os.path.exists(filename):
-        print(f"Error: File {filename} not found.")
-        sys.exit(1)
+        raise FileNotFoundError(f"File {filename} not found.")
 
     with open(filename, "r") as f:
         input_data = f.read().strip()
 
     if not input_data:
-        print("Error: Input file is empty.")
-        sys.exit(1)
+        raise ValueError("Input file is empty.")
 
-    digits = [int(d) for d in input_data]
+    try:
+        digits = [int(d) for d in input_data]
+    except ValueError as e:
+        raise ValueError(f"Invalid input: {input_data}. Expected a sequence of digits.") from e
 
     # Part 1
     result_p1 = solve_part1(digits)
@@ -90,4 +91,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
