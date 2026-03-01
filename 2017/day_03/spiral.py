@@ -8,6 +8,7 @@ into larger works, provided that the MPL-licensed components remain under the MP
 and their source code remains available.
 """
 
+import math
 import sys
 
 
@@ -29,9 +30,7 @@ def find_distance(goal: int) -> int:
         return 0
 
     # Find the ring number 'n' (radius)
-    n = 0
-    while (2 * n + 1) ** 2 < goal:
-        n += 1
+    n = int(math.ceil((math.sqrt(goal) - 1) / 2))
 
     side_length = 2 * n + 1
     max_val = side_length**2
@@ -84,38 +83,60 @@ def find_first_larger(goal: int) -> int:
             dx, dy = -dy, dx
 
 
-def solve(filename: str = "input.txt") -> None:
+def read_input(filename: str = "input.txt") -> int:
     """
-    Solve Part 1 and Part 2 of the puzzle.
+    Read the goal value from the input file.
 
     Parameters
     ----------
     filename : str
         The name of the file containing the goal value.
+
+    Returns
+    -------
+    int
+        The goal value.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file does not exist.
+    ValueError
+        If the file is empty or contains an invalid integer.
     """
-    try:
-        with open(filename, "r") as f:
-            content = f.read().strip()
-            if not content:
-                print(f"Error: {filename} is empty.")
-                return
-            goal = int(content)
-    except FileNotFoundError:
-        print(f"Error: {filename} not found.")
-        return
-    except ValueError:
-        print(f"Error: Invalid integer in {filename}.")
-        return
+    with open(filename, "r") as f:
+        content = f.read().strip()
+        if not content:
+            raise ValueError(f"Error: {filename} is empty.")
+        return int(content)
 
-    # Part 1
+
+def solve(goal: int) -> tuple[int, int]:
+    """
+    Solve Part 1 and Part 2 of the puzzle.
+
+    Parameters
+    ----------
+    goal : int
+        The target square number on the spiral grid.
+
+    Returns
+    -------
+    tuple[int, int]
+        The results for Part 1 and Part 2.
+    """
     distance = find_distance(goal)
-    print(f"Part 1: {distance}")
-
-    # Part 2
     first_larger = find_first_larger(goal)
-    print(f"Part 2: {first_larger}")
+    return distance, first_larger
 
 
 if __name__ == "__main__":
     target_file = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
-    solve(target_file)
+    try:
+        goal_val = read_input(target_file)
+        res_p1, res_p2 = solve(goal_val)
+        print(f"Part 1: {res_p1}")
+        print(f"Part 2: {res_p2}")
+    except (FileNotFoundError, ValueError) as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
