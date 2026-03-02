@@ -101,9 +101,9 @@ def solve_part2(lines: List[str]) -> int:
     return count
 
 
-def main(filename: str = "input.txt") -> int:
+def main(filename: str = "input.txt") -> tuple[int, int]:
     """
-    Main entry point for the script.
+    Orchestrate the solution for both parts of the problem.
 
     Parameters
     ----------
@@ -112,19 +112,13 @@ def main(filename: str = "input.txt") -> int:
 
     Returns
     -------
-    int
-        Exit code (0 for success, 1 for error).
+    tuple of (int, int)
+        A tuple containing the results for Part 1 and Part 2.
     """
-    try:
-        with open(filename, "r", encoding="utf-8") as f:
-            lines = f.readlines()
-    except FileNotFoundError:
-        print(f"Error: Could not find file {filename}", file=sys.stderr)
-        return 1
+    with open(filename, "r", encoding="utf-8") as f:
+        lines = f.readlines()
 
-    print(f"Part 1: {solve_part1(lines)}")
-    print(f"Part 2: {solve_part2(lines)}")
-    return 0
+    return solve_part1(lines), solve_part2(lines)
 
 
 class TestPassphrases(unittest.TestCase):
@@ -153,4 +147,14 @@ if __name__ == "__main__":
         unittest.main()
     else:
         file_arg = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
-        sys.exit(main(file_arg))
+        try:
+            res1, res2 = main(file_arg)
+            print(f"Part 1: {res1}")
+            print(f"Part 2: {res2}")
+            sys.exit(0)
+        except FileNotFoundError:
+            print(f"Error: Could not find file {file_arg}", file=sys.stderr)
+            sys.exit(1)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}", file=sys.stderr)
+            sys.exit(1)
