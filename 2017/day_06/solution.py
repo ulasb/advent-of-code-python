@@ -91,23 +91,22 @@ def main(input_file: str = "input.txt") -> None:
     input_file : str, optional
         Path to the input file, by default "input.txt".
     """
-    if not os.path.exists(input_file):
-        print(f"Error: {input_file} not found.")
-        return
-
     try:
         with open(input_file, "r") as f:
             line = f.read().strip()
             if not line:
-                print("Error: Input file is empty.")
+                print("Error: Input file is empty.", file=sys.stderr)
                 return
             # Input is typically a tab/space separated list of numbers
             initial_banks = [int(x) for x in line.split()]
+    except FileNotFoundError:
+        print(f"Error: {input_file} not found.", file=sys.stderr)
+        return
     except ValueError as e:
-        print(f"Error: Invalid input format. Expected space-separated integers. {e}")
+        print(f"Error: Invalid input format. Expected space-separated integers. {e}", file=sys.stderr)
         return
     except Exception as e:
-        print(f"Error: Unexpected error reading input. {e}")
+        print(f"Error: Unexpected error reading input. {e}", file=sys.stderr)
         return
 
     part1, part2 = solve(initial_banks)
