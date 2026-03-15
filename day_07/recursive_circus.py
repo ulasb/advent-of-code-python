@@ -4,7 +4,7 @@ Created by Ulaş Bardak.
 This code is published under the Mozilla Public License 2.0.
 """
 
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
 
 class Program:
@@ -115,7 +115,49 @@ def calculate_weights(programs: Dict[str, Program], root: str) -> int:
     return total_weight
 
 
-def find_imbalance(programs: Dict[str, Program], node: str, target_weight: int) -> int:
+def _find_imbalanced_child(
+    programs: Dict[str, "Program"], program: "Program"
+) -> Tuple[Optional[str], Optional[int]]:
+    """
+    Finds the imbalanced child of a program and the normal weight among children.
+
+    Parameters
+    ----------
+    programs : Dict[str, Program]
+        A dictionary of all programs.
+    program : Program
+        The program whose children are to be checked.
+
+    Returns
+    -------
+    Tuple[Optional[str], Optional[int]]
+        A tuple containing the name of the unbalanced child and the target normal weight.
+        If there's no imbalance, returns (None, None).
+    """
+    child_weights = {}
+    for child in program.children:
+        weight = programs[child].total_weight
+        if weight not in child_weights:
+            child_weights[weight] = []
+        child_weights[weight].append(child)
+
+    if len(child_weights) <= 1:
+        return None, None
+
+    normal_weight = None
+    abnormal_node = None
+    for weight, children_list in child_weights.items():
+        if len(children_list) == 1:
+            abnormal_node = children_list[0]
+        else:
+            normal_weight = weight
+
+    return abnormal_node, normal_weight
+
+
+def find_imbalance(
+    programs: Dict[str, "Program"], node: str, target_weight: int
+) -> int:
     """
     Finds the corrected weight of the program causing the imbalance (Part 2).
 
@@ -140,32 +182,12 @@ def find_imbalance(programs: Dict[str, Program], node: str, target_weight: int) 
         diff = program.total_weight - target_weight
         return program.weight - diff
 
-    child_weights = {}
-    for child in program.children:
-        weight = programs[child].total_weight
-        if weight not in child_weights:
-            child_weights[weight] = []
-        child_weights[weight].append(child)
+    abnormal_node, normal_weight = _find_imbalanced_child(programs, program)
 
-    if len(child_weights) == 1:
+    if abnormal_node is None or normal_weight is None:
         # All children are balanced, so the imbalance is exactly at this node
         diff = program.total_weight - target_weight
         return program.weight - diff
-
-    # There is an imbalance among the children
-    abnormal_weight = None
-    normal_weight = None
-    abnormal_node = None
-    for weight, children_list in child_weights.items():
-        if len(children_list) == 1:
-            abnormal_weight = weight
-            abnormal_node = children_list[0]
-        else:
-            normal_weight = weight
-
-    if abnormal_node is None or normal_weight is None:
-        # This shouldn't happen based on the problem description
-        raise ValueError("Could not find the distinct unbalanced child.")
 
     # The abnormal node is the one causing the imbalance, drill down into it
     return find_imbalance(programs, abnormal_node, normal_weight)
@@ -211,28 +233,12 @@ def solve_part_2(filepath: str = "input.txt") -> int:
 
     program = programs[root]
 
-    child_weights = {}
-    for child in program.children:
-        weight = programs[child].total_weight
-        if weight not in child_weights:
-            child_weights[weight] = []
-        child_weights[weight].append(child)
-
-    if len(child_weights) <= 1:
-        raise ValueError("The tower is completely balanced.")
-
-    abnormal_weight = None
-    normal_weight = None
-    abnormal_node = None
-    for weight, children_list in child_weights.items():
-        if len(children_list) == 1:
-            abnormal_weight = weight
-            abnormal_node = children_list[0]
-        else:
-            normal_weight = weight
+    abnormal_node, normal_weight = _find_imbalanced_child(programs, program)
 
     if abnormal_node is None or normal_weight is None:
-        raise ValueError("Could not find the distinct unbalanced child from root.")
+        raise ValueError(
+            "The tower is completely balanced or unbalanced node cannot be found."
+        )
 
     return find_imbalance(programs, abnormal_node, normal_weight)
 

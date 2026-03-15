@@ -6,6 +6,7 @@ This code is published under the Mozilla Public License 2.0.
 
 import unittest
 import os
+import tempfile
 from recursive_circus import solve_part_1, solve_part_2
 
 
@@ -14,8 +15,9 @@ class TestRecursiveCircus(unittest.TestCase):
 
     def setUp(self):
         """Sets up the test data."""
-        self.test_filepath = "test_input.txt"
-        with open(self.test_filepath, "w") as f:
+        fd, self.test_filepath = tempfile.mkstemp(text=True)
+        self.addCleanup(os.remove, self.test_filepath)
+        with os.fdopen(fd, "w") as f:
             f.write(
                 "pbga (66)\n"
                 "xhth (57)\n"
@@ -31,11 +33,6 @@ class TestRecursiveCircus(unittest.TestCase):
                 "gyxo (61)\n"
                 "cntj (57)\n"
             )
-
-    def tearDown(self):
-        """Cleans up the test data."""
-        if os.path.exists(self.test_filepath):
-            os.remove(self.test_filepath)
 
     def test_part_1(self):
         """Tests Part 1 with the sample input."""
