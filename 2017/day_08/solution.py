@@ -6,8 +6,19 @@ but requires that source code changes be made available under the same license.
 """
 
 import sys
+import operator
 from collections import defaultdict
 from typing import Dict, Tuple, Callable
+
+# Operators for condition check
+OPERATORS: Dict[str, Callable[[int, int], bool]] = {
+    ">": operator.gt,
+    "<": operator.lt,
+    ">=": operator.ge,
+    "<=": operator.le,
+    "==": operator.eq,
+    "!=": operator.ne,
+}
 
 
 def solve_instructions(input_data: str) -> Tuple[int, int]:
@@ -32,16 +43,6 @@ def solve_instructions(input_data: str) -> Tuple[int, int]:
     registers: Dict[str, int] = defaultdict(int)
     max_ever = 0
 
-    # Operators for condition check
-    ops: Dict[str, Callable[[int, int], bool]] = {
-        ">": lambda a, b: a > b,
-        "<": lambda a, b: a < b,
-        ">=": lambda a, b: a >= b,
-        "<=": lambda a, b: a <= b,
-        "==": lambda a, b: a == b,
-        "!=": lambda a, b: a != b,
-    }
-
     for line in input_data.strip().split("\n"):
         if not line:
             continue
@@ -60,7 +61,7 @@ def solve_instructions(input_data: str) -> Tuple[int, int]:
         cond_val = int(parts[6])
 
         # Evaluate condition
-        if ops[cond_op](registers[cond_reg], cond_val):
+        if OPERATORS[cond_op](registers[cond_reg], cond_val):
             # Apply operation
             if operation == "inc":
                 registers[target_reg] += amount
@@ -84,20 +85,21 @@ def main(file_path: str = "input.txt"):
     file_path : str
         Path to the input text file. Default is 'input.txt'.
     """
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            input_data = f.read()
+    with open(file_path, "r", encoding="utf-8") as f:
+        input_data = f.read()
 
-        p1, p2 = solve_instructions(input_data)
-        print(f"Part 1: {p1}")
-        print(f"Part 2: {p2}")
-
-    except FileNotFoundError:
-        print(f"Error: {file_path} not found.")
-    except Exception as e:
-        print(f"Error occurred: {e}")
+    p1, p2 = solve_instructions(input_data)
+    print(f"Part 1: {p1}")
+    print(f"Part 2: {p2}")
 
 
 if __name__ == "__main__":
-    path = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
-    main(path)
+    try:
+        path = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+        main(path)
+    except FileNotFoundError:
+        print(f"Error: {sys.argv[1] if len(sys.argv) > 1 else 'input.txt'} not found.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        sys.exit(1)
