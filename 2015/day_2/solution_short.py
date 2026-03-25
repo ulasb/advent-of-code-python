@@ -4,9 +4,11 @@ Brief AOC 2015 Day 2 implementation.
 Licensed under Mozilla Public License 2.0 by Ulaş Bardak.
 """
 
+import io
 import sys
 import unittest
-from typing import List, Tuple
+from unittest.mock import patch
+from typing import Tuple
 
 
 def solve(filename: str = "input.txt") -> Tuple[int, int]:
