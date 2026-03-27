@@ -36,19 +36,19 @@ def count_unique_houses(directions: str, num_actors: int = 1) -> int:
     return len(visited)
 
 
-def main() -> None:
+def main() -> int:
     """Parse input and print solutions for both parts."""
     input_file = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
     try:
         with open(input_file, "r", encoding="utf-8") as f:
             data = f.read().strip()
         if not data:
-            print("Error: Input data is empty.", file=sys.stderr)
-            return
+            return 1
         print(f"Part 1: {count_unique_houses(data, 1)}")
         print(f"Part 2: {count_unique_houses(data, 2)}")
+        return 0
     except FileNotFoundError:
-        print(f"Error: {input_file} not found.", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
