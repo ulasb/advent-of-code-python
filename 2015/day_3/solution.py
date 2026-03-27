@@ -28,7 +28,7 @@ def count_unique_houses(directions: str, num_actors: int = 1) -> int:
         Total count of unique positions visited by all actors.
     """
     move_map = {"^": 1j, "v": -1j, ">": 1, "<": -1}
-    visited: Set[complex] = {0j}
+    visited: Set[complex] = set()
     for i in range(num_actors):
         # Slice instructions for each actor and accumulate positions
         moves = (move_map.get(char, 0j) for char in directions[i::num_actors])
